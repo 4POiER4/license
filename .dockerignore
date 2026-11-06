@@ -1,0 +1,10 @@
+.git
+.env
+.local-access.txt
+.venv
+__pycache__
+*.sqlite3
+staticfiles
+backups
+test-results
+outputs

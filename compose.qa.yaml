@@ -1,0 +1,13 @@
+# Isolated browser QA: a separate Compose project and a separate database volume.
+# docker compose -p license-registry-qa -f compose.yaml -f compose.qa.yaml up -d --wait
+services:
+  web:
+    image: license-registry-web:latest
+    ports: !override
+      - "127.0.0.1:8097:8000"
+    environment:
+      ALLOW_DEMO_DATA: "1"
+      DEMO_MODE: "1"
+      APP_USERNAME: review
+      APP_PASSWORD: Review-only-2026-password
+      DJANGO_CSRF_TRUSTED_ORIGINS: http://localhost:8097,http://127.0.0.1:8097

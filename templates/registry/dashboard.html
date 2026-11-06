@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% load ui %}
+{% block subtitle %}Все ваши программы, договоры и сроки действия — в одном месте.{% endblock %}
+{% block actions %}<a class="button secondary" href="{% url 'export_csv' %}?{{ request.GET.urlencode }}">{% icon 'down' %} Экспорт</a><a class="button primary" href="{% url 'contract_create' %}">{% icon 'plus' %} Добавить договор</a>{% endblock %}
+{% block content %}
+<section class="stats-grid" aria-label="Сводка по лицензиям">
+  <a class="stat-card" href="{% url 'dashboard' %}"><div class="stat-top">Всего позиций ПО<span class="stat-icon gray">{% icon 'grid' %}</span></div><strong>{{ stats.total }}</strong><div class="stat-caption">В {{ stats.contracts }} договорах</div></a>
+  <a class="stat-card" href="?status=active"><div class="stat-top">Действующие<span class="stat-icon green">{% icon 'check' %}</span></div><strong>{{ stats.active }}</strong><div class="stat-caption"><span class="dot green-dot"></span> Срочные лицензии</div></a>
+  <a class="stat-card {% if stats.attention %}stat-attention{% endif %}" href="?status=attention"><div class="stat-top">Требуют внимания<span class="stat-icon red">{% icon 'clock' %}</span></div><strong>{{ stats.attention }}</strong><div class="stat-caption">Подошёл срок напоминания</div></a>
+  <a class="stat-card" href="?status=perpetual"><div class="stat-top">Бессрочные<span class="stat-icon blue">{% icon 'infinity' %}</span></div><strong>{{ stats.perpetual }}</strong><div class="stat-caption">Без даты окончания</div></a>
+</section>
+{% if reminder_count %}<section class="attention-banner"><span class="banner-icon">{% icon 'bell' %}</span><div><strong>Есть лицензии, которые требуют внимания</strong><p>Позиций: {{ reminder_count }}. Проверьте сроки и запланируйте продление.</p></div><a href="{% url 'notifications' %}">Посмотреть {% icon 'arrow' %}</a></section>{% endif %}
+<section class="panel registry-panel"><div class="panel-heading"><div><h2>Лицензии <span class="count-pill">{{ stats.total }}</span></h2><p>Отслеживайте сроки и сохраняйте историю продлений</p></div><a class="text-link" href="{% url 'license_create' %}">{% icon 'plus' %} Добавить позицию</a></div>
+<div class="filter-tabs" role="navigation" aria-label="Статус лицензии">
+<a class="{% if not request.GET.status or request.GET.status == 'all' %}active{% endif %}" href="{% query_url status='all' page=None %}">Все лицензии</a>
+<a class="{% if request.GET.status == 'attention' %}active{% endif %}" href="{% query_url status='attention' page=None %}">Требуют внимания {% if stats.attention %}<span class="tab-count">{{ stats.attention }}</span>{% endif %}</a>
+<a class="{% if request.GET.status == 'perpetual' %}active{% endif %}" href="{% query_url status='perpetual' page=None %}">Бессрочные</a>
+<a class="{% if request.GET.status == 'expired' %}active{% endif %}" href="{% query_url status='expired' page=None %}">Истёкшие <span class="tab-count">{{ stats.expired }}</span></a>
+</div>
+<form class="filter-bar" method="get"><input type="hidden" name="status" value="{{ request.GET.status|default:'all' }}"><label class="search-field">{% icon 'search' %}<span class="sr-only">Поиск</span><input type="search" name="q" value="{{ request.GET.q }}" placeholder="Поиск по ПО, договору или контрагенту"></label><label class="currency-filter"><span class="sr-only">Валюта</span><select name="currency" aria-label="Валюта"><option value="">Все валюты</option>{% for value,label in currencies %}<option value="{{ value }}" {% if request.GET.currency == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label><button class="button secondary compact" type="submit">Найти</button>{% if request.GET.q or request.GET.currency %}<a class="clear-filters" href="{% url 'dashboard' %}">Сбросить</a>{% endif %}</form>
+{% include 'registry/license_table.html' with rows=page_obj %}
+{% include 'registry/pagination.html' %}
+</section>
+<div class="registry-hint">{% icon 'clock' %}<span>Красным отмечены позиции за 2 месяца до окончания и после истечения срока. Напоминания прекращаются через 5 дней после окончания.</span></div>
+{% endblock %}

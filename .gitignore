@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.local-access.txt
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+staticfiles/
+backups/
+test-results/
+outputs/
+.DS_Store

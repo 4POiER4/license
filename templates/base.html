@@ -1,0 +1,22 @@
+{% load static ui %}<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#17382e"><title>{{ title|default:'Лицензии' }} · Лицензии</title><link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml"><link rel="stylesheet" href="{% static 'app.css' %}"><script src="{% static 'app.js' %}" defer></script></head>
+<body><a class="skip-link" href="#main">Перейти к содержимому</a>
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="{% url 'dashboard' %}"><span class="brand-symbol">{% icon 'grid' %}</span><span>Лицензии<span class="brand-sub">УЧЁТ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ</span></span></a>
+  <div class="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+  <nav aria-label="Главное меню">
+    <a class="nav-link {% if section == 'dashboard' %}selected{% endif %}" {% if section == 'dashboard' %}aria-current="page"{% endif %} href="{% url 'dashboard' %}">{% icon 'grid' %} Реестр лицензий</a>
+    <a class="nav-link {% if section == 'contracts' %}selected{% endif %}" {% if section == 'contracts' %}aria-current="page"{% endif %} href="{% url 'contracts' %}">{% icon 'file' %} Договоры</a>
+    <a class="nav-link {% if section == 'notifications' %}selected{% endif %}" {% if section == 'notifications' %}aria-current="page"{% endif %} href="{% url 'notifications' %}">{% icon 'bell' %} Уведомления {% if reminder_count %}<span class="nav-count">{{ reminder_count }}</span>{% endif %}</a>
+    <a class="nav-link {% if section == 'renewals' %}selected{% endif %}" {% if section == 'renewals' %}aria-current="page"{% endif %} href="{% url 'renewals' %}">{% icon 'repeat' %} История продлений</a>
+  </nav>
+  <div class="sidebar-bottom"><div class="sidebar-note"><span class="live-dot"></span> Всё под контролем<p>Договоры, лицензии и сроки<br>в одном месте.</p></div>
+    <details class="account"><summary><span class="avatar">ОТ</span><span>Общая учётная запись<small>{{ user.username }}</small></span><span class="account-dots">···</span></summary><div class="account-menu"><a href="{% url 'password_change' %}">{% icon 'key' %} Сменить пароль</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>{% icon 'logout' %} Выйти</button></form></div></details>
+  </div>
+</aside>
+<div class="app-shell"><header class="topbar"><div class="topbar-path"><button type="button" class="icon-button mobile-menu" aria-label="Открыть меню" aria-expanded="false">{% icon 'menu' %}</button><span>Рабочее пространство</span><span class="path-divider">/</span><strong>{{ title }}</strong></div><div class="topbar-right"><span class="topbar-date">{{ today|date:'j E Y' }}</span><a class="notification-button" href="{% url 'notifications' %}" aria-label="Уведомления: {{ reminder_count }}">{% icon 'bell' %}{% if reminder_count %}<i></i>{% endif %}</a></div></header>
+<main id="main">{% if demo_mode %}<div class="info-note">Демонстрационная среда · Все договоры, поставщики и суммы здесь вымышленные.</div>{% endif %}<div class="page-heading"><div><div class="eyebrow">{% block eyebrow %}ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ{% endblock %}</div><h1>{{ title }}</h1><p>{% block subtitle %}Лицензии, которые работают на вас.{% endblock %}</p></div><div class="heading-actions">{% block actions %}{% endblock %}</div></div>
+{% for message in messages %}<div class="flash {{ message.tags }}" role="status">{% icon 'check' %}<span>{{ message }}</span><button type="button" data-dismiss aria-label="Закрыть">{% icon 'close' %}</button></div>{% endfor %}
+{% block content %}{% endblock %}
+<footer class="page-footer"><span><span class="tiny-square"></span> Лицензии · Рабочее пространство отдела</span><span>Часовой пояс: Минск</span></footer>
+</main></div>{% block dialogs %}{% include 'registry/reminder_dialog.html' %}{% endblock %}</body></html>
